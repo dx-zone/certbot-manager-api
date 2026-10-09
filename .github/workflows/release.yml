@@ -1,0 +1,52 @@
+# After adding it, create a tag like v0.1.0 and push it; the workflow will publish release assets you can wget.
+# .github/workflows/release.yml
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build linux/amd64 binary
+        env:
+          CGO_ENABLED: "0"
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          mkdir -p dist
+          go build -trimpath -ldflags "-s -w" -o dist/certbot-manager-api-linux-amd64 .
+          cd dist
+          sha256sum certbot-manager-api-linux-amd64 > certbot-manager-api-linux-amd64.sha256
+          tar -czf certbot-manager-api-linux-amd64.tar.gz certbot-manager-api-linux-amd64
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: certbot-manager-api-linux-amd64
+          path: dist/*
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/certbot-manager-api-linux-amd64
+            dist/certbot-manager-api-linux-amd64.sha256
+            dist/certbot-manager-api-linux-amd64.tar.gz
