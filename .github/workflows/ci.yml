@@ -46,6 +46,9 @@ jobs:
       - name: Run Go tests
         run: make test
 
+      - name: Run Go race detector
+        run: make test-race
+
       - name: Build Linux AMD64 binary
         run: make build-linux
 
