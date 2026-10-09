@@ -1,0 +1,63 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate and Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+
+      - name: Display Go version
+        run: go version
+
+      - name: Download dependencies
+        run: make deps
+
+      - name: Check formatting
+        run: make fmt-check
+
+      - name: Run static analysis
+        run: make vet
+
+      - name: Run Go tests
+        run: make test
+
+      - name: Build Linux AMD64 binary
+        run: make build-linux
+
+      - name: Verify executable
+        run: |
+          file dist/cert-manager-api-linux-amd64
+          test -s dist/cert-manager-api-linux-amd64
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cert-manager-api-linux-amd64
+          path: dist/cert-manager-api-linux-amd64
+          if-no-files-found: error
+          retention-days: 7
