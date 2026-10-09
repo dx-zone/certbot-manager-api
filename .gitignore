@@ -1,0 +1,236 @@
+# ==============================================================================
+# Certbot Manager REST API
+# Git Ignore Rules
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Go compiled binaries and build artifacts
+# ------------------------------------------------------------------------------
+/cert-manager-api
+/dist/
+/build/
+/bin/
+/tmp/
+/temp/
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.a
+*.o
+*.obj
+*.test
+*.out
+*.prof
+*.pprof
+*.cover
+*.coverage
+coverage.*
+coverage/
+*.profraw
+
+# Go workspace (local configuration)
+go.work
+go.work.sum
+
+# ------------------------------------------------------------------------------
+# Cryptographic keys, certificates, and PKI material
+# ------------------------------------------------------------------------------
+*.key
+*.pem
+*.p12
+*.pfx
+*.p8
+*.p7b
+*.p7c
+*.p7m
+*.jks
+*.keystore
+*.asc
+*.gpg
+*.kdbx
+
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+
+*.csr
+*.crt
+*.cer
+*.der
+*.p10
+*.srl
+
+# PKI runtime directories
+/secrets/
+/pki/
+/certs/
+/certificates/
+/private/
+/letsencrypt/
+/acme/
+
+# ------------------------------------------------------------------------------
+# Secrets, credentials, environment files, and vaults
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+
+*.secret
+*.secrets
+*.credentials
+*.token
+
+credentials*
+secret*
+secrets*
+vault*
+Vault*
+VAULT*
+
+*.vault
+*.vault.*
+*.age
+*.sops.*
+
+**/.vault/
+**/.secrets/
+**/vaults/
+**/secrets/
+
+# Common secret-management artifacts
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# ------------------------------------------------------------------------------
+# Local infrastructure inventories and sensitive datasets
+# ------------------------------------------------------------------------------
+/certificates.csv
+/clients.txt
+/ips.txt
+
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# ------------------------------------------------------------------------------
+# Logs, debug output, and runtime data
+# ------------------------------------------------------------------------------
+*.log
+*.log.*
+/logs/
+**/logs/
+
+nohup.out
+*.pid
+*.pid.lock
+*.sock
+*.socket
+
+*.dump
+*.core
+core
+core.*
+
+# ------------------------------------------------------------------------------
+# JetBrains IDEs (GoLand, IntelliJ, PyCharm, WebStorm)
+# ------------------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# ------------------------------------------------------------------------------
+# Visual Studio Code
+# ------------------------------------------------------------------------------
+.vscode/
+*.code-workspace
+.history/
+.vscode-test/
+
+# ------------------------------------------------------------------------------
+# Sublime Text
+# ------------------------------------------------------------------------------
+*.sublime-workspace
+*.sublime-project
+*.sublime-settings
+*.sublime_session
+*.sublime_session.tmp
+
+# ------------------------------------------------------------------------------
+# Vim / Neovim
+# ------------------------------------------------------------------------------
+*.swp
+*.swo
+*.swn
+*~
+.*.swp
+Session.vim
+
+# ------------------------------------------------------------------------------
+# TODO files and private development notes
+# ------------------------------------------------------------------------------
+TODO*
+todo*
+Todo*
+**/TODO*
+**/todo*
+**/Todo*
+
+# ------------------------------------------------------------------------------
+# OS-generated files
+# ------------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+.Trashes
+.Spotlight-V100
+
+# ------------------------------------------------------------------------------
+# Archives and temporary backups
+# ------------------------------------------------------------------------------
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+*.cache
+*.swp
+
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# ------------------------------------------------------------------------------
+# Python artifacts (for auxiliary scripts)
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# ------------------------------------------------------------------------------
+# Local development overrides
+# ------------------------------------------------------------------------------
+*.local
+*.local.*
+config.local.*
+settings.local.*

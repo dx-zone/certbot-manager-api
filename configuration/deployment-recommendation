@@ -1,0 +1,75 @@
+cat << EOF > /etc/systemd/system/cert-api.service
+[Unit]
+Description=Certbot Manager API
+After=docker.service
+
+[Service]
+ExecStart=/usr/local/bin/cert-api-binary
+Restart=always
+User=root 
+# Run as root or a user in the docker group
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+Developer Tips for Deployment
+Linux Capabilities: Since you're binding to port :443, you'll likely run into a "permission denied" error if not running as root. Instead of using sudo for the binary, run this command once to allow the binary to bind to privileged ports:
+sudo setcap 'cap_net_bind_service=+ep' ./cert-manager-api
+
+Docker Socket: Ensure the user running this API has permission to talk to the Docker daemon (usually by being in the docker group), otherwise the reloadCertbot function will fail with an "execution error."
+
+Clients.txt: Remember that the Common Names in this file are case-sensitive and must match the CN field in your client certificates exactly.
+
+
+
+To get the server running, you need to map your existing Let's Encrypt certificates for the server's own HTTPS identity, while creating placeholders for the mTLS and ACL files that the validateFiles logic is currently demanding.
+
+Since your hostname is x.mydatacenter.io, we will use its specific certificate path for the -tls-cert and -tls-key.
+
+1. Prepare the Configuration Files
+Run these commands in your project directory to create the required text files so the validator passes:
+
+Bash
+# Create an empty IP list (allow-all by default since it's empty)
+touch ips.txt
+
+# Create an empty allowed clients list (mTLS will fail until you add a CN here)
+touch clients.txt
+
+# Ensure your CSV exists
+touch certificates.csv
+2. Locate your mTLS CA
+Crucial Note: You mentioned earlier that ca.crt is for mTLS. You cannot use the Let's Encrypt chain.pem as your client-ca unless you want anyone with a Let's Encrypt certificate to be able to call your API.
+
+If you have a private CA (e.g., from OpenSSL or Vault), point -client-ca to that.
+
+For testing purposes only, if you haven't made one yet, you can cp /opt/certbot/datastore/certbot-data/letsencrypt/live/x.mydatacenter.io/chain.pem ./ca.crt just to get the process to start.
+
+3. Construct the Execution Command
+Use the absolute paths to your live certificates to ensure the server starts securely:
+
+Bash
+./cert-manager-api \
+  -listen :8443 \
+  -tls-cert /opt/certbot/datastore/certbot-data/letsencrypt/live/x.mydatacenter.io/fullchain.pem \
+  -tls-key /opt/certbot/datastore/certbot-data/letsencrypt/live/x.mydatacenter.io/privkey.pem \
+  -client-ca ./ca.crt \
+  -allowed-cns ./clients.txt \
+  -ip-list ./ips.txt \
+  -ip-policy allow \
+  -cert-csv ./certificates.csv
+4. Why these specific paths?
+fullchain.pem: This includes your server certificate and the intermediate cert. This prevents "Insecure Connection" warnings in browsers and Swagger.
+
+privkey.pem: The private key for x.mydatacenter.io.
+
+Port :8443: Since you are running as a user and not root, you likely cannot bind to :443. Using 8443 is the standard alternative.
+
+5. Next Test Step
+Once the server says listening on :8443, verify the health check from another terminal:
+
+Bash
+curl -k https://localhost:8443/healthcheck
+If that returns the "UP" status, your logic is working! To test the other endpoints, you'll need to add your test certificate's Common Name to clients.txt. Would you like the OpenSSL command to generate a quick test client certificate for mTLS?
